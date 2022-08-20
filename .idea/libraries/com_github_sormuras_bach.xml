@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="com.github.sormuras.bach">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/.bach/bin/com.github.sormuras.bach.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
