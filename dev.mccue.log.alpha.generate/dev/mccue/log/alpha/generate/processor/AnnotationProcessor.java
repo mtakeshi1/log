@@ -43,22 +43,7 @@ public final class AnnotationProcessor extends AbstractProcessor {
                         element
                 );
             } else {
-                var members = elementUtils.getAllMembers(typeElement);
-                var fields = ElementFilter.fieldsIn(members);
-
-
-                var constructors = ElementFilter.constructorsIn(members);
-                var hasValidConstructor = constructors
-                        .stream()
-                        .anyMatch(constructor ->
-                                constructor.getParameters().size() == 0 &&
-                                        !constructor.getModifiers().contains(Modifier.PRIVATE)
-                        );
-
-
-
                 var className = typeElement.getSimpleName();
-
                 var enclosingElement = typeElement.getEnclosingElement();
                 if (!(enclosingElement instanceof PackageElement packageElement)) {
                     messager.printMessage(
