@@ -1,6 +1,4 @@
-package dev.mccue.log.alpha.generate.processor;
-
-import dev.mccue.log.alpha.generate.DeriveLogger;
+package dev.mccue.log.alpha.generate;
 
 import java.io.IOException;
 import java.util.Set;
@@ -8,7 +6,6 @@ import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.*;
-import javax.lang.model.util.ElementFilter;
 import javax.tools.Diagnostic;
 
 /**
