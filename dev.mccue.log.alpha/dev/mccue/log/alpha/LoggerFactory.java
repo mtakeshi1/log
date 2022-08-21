@@ -6,15 +6,13 @@ import java.util.ServiceLoader;
 import java.util.concurrent.ThreadLocalRandom;
 
 public interface LoggerFactory {
-    Logger createLogger();
-
     static LoggerFactory create() {
         var loggerFactories = ServiceLoader.load(LoggerFactory.class).iterator();
         if (!loggerFactories.hasNext()) {
             System.err.println("No logger factory supplied. Falling back to no-op logger");
-            return () -> (__) -> {};
-        }
-        else {
+            return () -> (__) -> {
+            };
+        } else {
             var service = loggerFactories.next();
             if (loggerFactories.hasNext()) {
                 var services = new ArrayList<LoggerFactory>();
@@ -25,8 +23,7 @@ public interface LoggerFactory {
 
                 System.err.printf("Multiple logger factories supplied: %s. Picking one at random%n", services);
                 return services.get(ThreadLocalRandom.current().nextInt(0, services.size()));
-            }
-            else {
+            } else {
                 return service;
             }
         }
@@ -47,4 +44,6 @@ public interface LoggerFactory {
     static Logger.Namespaced getLogger(MethodHandles.Lookup lookup) {
         return getLogger(lookup.lookupClass());
     }
+
+    Logger createLogger();
 }

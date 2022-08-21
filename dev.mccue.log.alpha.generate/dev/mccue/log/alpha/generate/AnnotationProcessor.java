@@ -1,12 +1,14 @@
 package dev.mccue.log.alpha.generate;
 
-import java.io.IOException;
-import java.util.Set;
 import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.SourceVersion;
-import javax.lang.model.element.*;
+import javax.lang.model.element.Element;
+import javax.lang.model.element.PackageElement;
+import javax.lang.model.element.TypeElement;
 import javax.tools.Diagnostic;
+import java.io.IOException;
+import java.util.Set;
 
 /**
  * Annotation processor that handles MagicBean annotations.
@@ -54,8 +56,7 @@ public final class AnnotationProcessor extends AbstractProcessor {
                 String packageName;
                 if (packageElement.isUnnamed()) {
                     packageName = null;
-                }
-                else {
+                } else {
                     packageName = packageElement.toString();
                 }
 
@@ -66,7 +67,6 @@ public final class AnnotationProcessor extends AbstractProcessor {
                 } else {
                     selfExpr = "((%s) this)".formatted(className);
                 }
-
 
 
                 var packageDecl = packageName == null ? "" : "package " + packageName + ";\n\n";

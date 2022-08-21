@@ -36,21 +36,6 @@ public record Log(
         this(CONTEXT.get(), Thread.currentThread(), timestamp, flake, level, type, entries);
     }
 
-    public sealed interface Context {
-        record Empty() implements Context {}
-        record NotEmpty(
-                Thread thread,
-                Instant timestamp,
-                Flake flake,
-                List<Log.Entry> entries,
-                Context parent
-        ) implements Context {}
-
-        static Context current() {
-            return CONTEXT.get();
-        }
-    }
-
     public static <T> T inContext(Supplier<T> code, List<Log.Entry> entries) {
         var original = CONTEXT.get();
         try {
@@ -62,8 +47,7 @@ public record Log(
                     original
             ));
             return code.get();
-        }
-        finally {
+        } finally {
             CONTEXT.set(original);
         }
     }
@@ -83,8 +67,7 @@ public record Log(
                     original
             ));
             code.run();
-        }
-        finally {
+        } finally {
             CONTEXT.set(original);
         }
     }
@@ -102,7 +85,27 @@ public record Log(
         ERROR
     }
 
-    public record Type(String namespace, String name) {}
+    public sealed interface Context {
+        static Context current() {
+            return CONTEXT.get();
+        }
+
+        record Empty() implements Context {
+        }
+
+        record NotEmpty(
+                Thread thread,
+                Instant timestamp,
+                Flake flake,
+                List<Log.Entry> entries,
+                Context parent
+        ) implements Context {
+        }
+    }
+
+    public record Type(String namespace, String name) {
+    }
+
     public record Entry(String key, Value value) {
 
         public Entry(java.lang.String key, Value value) {
@@ -182,9 +185,11 @@ public record Log(
         public static Entry of(String key, java.time.LocalDate value) {
             return of(key, value, Value.LocalDate::new);
         }
+
         public static Entry of(String key, java.time.LocalTime value) {
             return of(key, value, Value.LocalTime::new);
         }
+
         public static Entry of(String key, java.time.Duration value) {
             return of(key, value, Value.Duration::new);
         }
@@ -211,20 +216,32 @@ public record Log(
         }
 
         public sealed interface Value {
-            record Null() implements Value {}
+            record Null() implements Value {
+            }
+
             record String(java.lang.String value) implements Value {
                 public String {
                     Objects.requireNonNull(value, "value must not be null");
                 }
             }
-            record Boolean(boolean value) implements Value {}
-            record Char(char value) implements Value {}
 
-            record Short(short value) implements Value {}
+            record Boolean(boolean value) implements Value {
+            }
 
-            record Int(int value) implements Value {}
-            record Long(long value) implements Value {}
-            record Double(double value) implements Value {}
+            record Char(char value) implements Value {
+            }
+
+            record Short(short value) implements Value {
+            }
+
+            record Int(int value) implements Value {
+            }
+
+            record Long(long value) implements Value {
+            }
+
+            record Double(double value) implements Value {
+            }
 
             record UUID(java.util.UUID value) implements Value {
                 public UUID {
