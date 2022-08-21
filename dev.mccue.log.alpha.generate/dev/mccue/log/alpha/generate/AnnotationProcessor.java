@@ -6,13 +6,10 @@ import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.PackageElement;
 import javax.lang.model.element.TypeElement;
-import javax.tools.Diagnostic;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.util.Set;
 
-/**
- * Annotation processor that handles MagicBean annotations.
- */
 public final class AnnotationProcessor extends AbstractProcessor {
     @Override
     public SourceVersion getSupportedSourceVersion() {
@@ -30,73 +27,51 @@ public final class AnnotationProcessor extends AbstractProcessor {
             RoundEnvironment roundEnv
     ) {
         var filer = this.processingEnv.getFiler();
-        var messager = this.processingEnv.getMessager();
-        var elementUtils = this.processingEnv.getElementUtils();
 
         Set<? extends Element> elements = roundEnv.getElementsAnnotatedWith(DeriveLogger.class);
         for (var element : elements) {
-            if (!(element instanceof TypeElement typeElement)) {
-                messager.printMessage(
-                        Diagnostic.Kind.ERROR,
-                        "Log annotation should only be placeable on classes.",
+            var typeElement = (TypeElement) element;
+            var className = typeElement.getSimpleName();
+
+            var topElement = typeElement.getEnclosingElement();
+            while (!(topElement instanceof PackageElement packageElement)) {
+                topElement = topElement.getEnclosingElement();
+            }
+
+            String packageName;
+            if (packageElement.isUnnamed()) {
+                packageName = null;
+            } else {
+                packageName = packageElement.toString();
+            }
+
+
+            var packageDecl = packageName == null ? "" : "package " + packageName + ";\n\n";
+
+
+            var classDeclStart = "sealed interface %s permits %s {\n".formatted(
+                    className + "Log", typeElement.getQualifiedName()
+            );
+
+            var classDeclEnd = "}";
+
+            var classDecl = new StringBuilder();
+            classDecl.append(packageDecl);
+            classDecl.append(classDeclStart);
+            classDecl.append("    static dev.mccue.log.alpha.Logger.Namespaced log =");
+            classDecl.append("\n         dev.mccue.log.alpha.LoggerFactory.getLogger(%s.class);\n".formatted(typeElement.getQualifiedName()));
+            classDecl.append(classDeclEnd);
+
+            try {
+                var file = filer.createSourceFile(
+                        (packageName == null ? "" : packageName + ".") + className + "Log",
                         element
                 );
-            } else {
-                var className = typeElement.getSimpleName();
-                var enclosingElement = typeElement.getEnclosingElement();
-                if (!(enclosingElement instanceof PackageElement packageElement)) {
-                    messager.printMessage(
-                            Diagnostic.Kind.ERROR,
-                            "Currently only top level classes supported.",
-                            element
-                    );
-                    return true;
+                try (var writer = file.openWriter()) {
+                    writer.append(classDecl.toString());
                 }
-
-                String packageName;
-                if (packageElement.isUnnamed()) {
-                    packageName = null;
-                } else {
-                    packageName = packageElement.toString();
-                }
-
-
-                String selfExpr;
-                if (typeElement.getAnnotation(DeriveLogger.class).useTypeSafeCast()) {
-                    selfExpr = "(switch (this) { case %s __ -> __; })".formatted(className);
-                } else {
-                    selfExpr = "((%s) this)".formatted(className);
-                }
-
-
-                var packageDecl = packageName == null ? "" : "package " + packageName + ";\n\n";
-
-
-                var classDeclStart = "sealed interface %s permits %s {\n\n".formatted(
-                        className + "Log", className
-                );
-
-                var classDeclEnd = "}";
-
-                var classDecl = new StringBuilder();
-                classDecl.append(packageDecl);
-                classDecl.append(classDeclStart);
-
-                classDecl.append("    static final dev.mccue.log.alpha.Logger.Namespaced log = dev.mccue.log.alpha.LoggerFactory.getLogger(%s.class);\n".formatted(className));
-
-                classDecl.append(classDeclEnd);
-
-                try {
-                    var file = filer.createSourceFile(
-                            (packageName == null ? "" : packageName + ".") + className + "Log",
-                            element
-                    );
-                    try (var writer = file.openWriter()) {
-                        writer.append(classDecl.toString());
-                    }
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
+            } catch (IOException e) {
+                throw new UncheckedIOException(e);
             }
         }
 

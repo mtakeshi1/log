@@ -13,10 +13,10 @@ public record Log(
         Instant timestamp,
         Flake flake,
         Level level,
-        Log.Type type,
+        Category category,
         List<Log.Entry> entries
 ) {
-    /**
+    /*
      * Should be an extent local, and that is a decent enough thing to be part of the public API.
      */
     private static final ThreadLocal<Context> CONTEXT;
@@ -27,13 +27,11 @@ public record Log(
     }
 
     public Log(
-            Instant timestamp,
-            Flake flake,
             Level level,
-            Log.Type type,
+            Category category,
             List<Log.Entry> entries
     ) {
-        this(CONTEXT.get(), Thread.currentThread(), timestamp, flake, level, type, entries);
+        this(CONTEXT.get(), Thread.currentThread(), Instant.now(), Flake.create(), level, category, entries);
     }
 
     public static <T> T inContext(Supplier<T> code, List<Log.Entry> entries) {
@@ -76,13 +74,17 @@ public record Log(
         inContext(code, List.of(entries));
     }
 
+    /**
+     *
+     */
     public enum Level {
         UNSPECIFIED,
         TRACE,
         DEBUG,
         INFO,
         WARN,
-        ERROR
+        ERROR,
+        FATAL
     }
 
     public sealed interface Context {
@@ -103,7 +105,7 @@ public record Log(
         }
     }
 
-    public record Type(String namespace, String name) {
+    public record Category(String namespace, String name) {
     }
 
     public record Entry(String key, Value value) {
@@ -120,6 +122,10 @@ public record Log(
 
         public static Entry of(String key, boolean value) {
             return new Entry(key, new Value.Boolean(value));
+        }
+
+        public static Entry of(String key, byte value) {
+            return new Entry(key, new Value.Byte(value));
         }
 
         public static Entry of(String key, char value) {
@@ -144,6 +150,10 @@ public record Log(
 
         public static Entry of(String key, java.lang.Boolean value) {
             return of(key, value, Value.Boolean::new);
+        }
+
+        public static Entry of(String key, java.lang.Byte value) {
+            return of(key, value, Value.Byte::new);
         }
 
         public static Entry of(String key, java.lang.Character value) {
@@ -226,6 +236,9 @@ public record Log(
             }
 
             record Boolean(boolean value) implements Value {
+            }
+
+            record Byte(byte value) implements Value {
             }
 
             record Char(char value) implements Value {

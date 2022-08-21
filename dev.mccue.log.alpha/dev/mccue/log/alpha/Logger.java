@@ -7,75 +7,72 @@ public interface Logger {
     void log(Log log);
 
     default void log(
-            Instant timestamp,
-            Flake flake,
             Log.Level level,
-            Log.Type type,
+            Log.Category category,
             List<Log.Entry> logEntries
     ) {
-        log(new Log(
-                timestamp,
-                flake,
-                level,
-                type,
-                logEntries
-        ));
+        log(new Log(level, category, logEntries));
     }
 
-    default void log(Log.Level level, Log.Type type, List<Log.Entry> logEntries) {
-        log(Instant.now(), Flake.create(), level, type, logEntries);
+
+    default void log(Log.Level level, Log.Category category, Log.Entry... logEntries) {
+        log(level, category, List.of(logEntries));
     }
 
-    default void log(Log.Level level, Log.Type type, Log.Entry... logEntries) {
-        log(Instant.now(), Flake.create(), level, type, List.of(logEntries));
+    default void log(Log.Category category, Log.Entry... logEntries) {
+        log(Log.Level.UNSPECIFIED, category, logEntries);
     }
 
-    default void log(Log.Type type, Log.Entry... logEntries) {
-        log(Log.Level.UNSPECIFIED, type, logEntries);
+    default void log(Log.Category category, List<Log.Entry> logEntries) {
+        log(Log.Level.UNSPECIFIED, category, logEntries);
     }
 
-    default void log(Log.Type type, List<Log.Entry> logEntries) {
-        log(Log.Level.UNSPECIFIED, type, logEntries);
+    default void trace(Log.Category category, Log.Entry... logEntries) {
+        log(Log.Level.TRACE, category, logEntries);
     }
 
-    default void trace(Log.Type type, Log.Entry... logEntries) {
-        log(Log.Level.TRACE, type, logEntries);
+    default void trace(Log.Category category, List<Log.Entry> logEntries) {
+        log(Log.Level.TRACE, category, logEntries);
     }
 
-    default void trace(Log.Type type, List<Log.Entry> logEntries) {
-        log(Log.Level.TRACE, type, logEntries);
+    default void debug(Log.Category category, Log.Entry... logEntries) {
+        log(Log.Level.DEBUG, category, logEntries);
     }
 
-    default void debug(Log.Type type, Log.Entry... logEntries) {
-        log(Log.Level.DEBUG, type, logEntries);
+    default void debug(Log.Category category, List<Log.Entry> logEntries) {
+        log(Log.Level.DEBUG, category, logEntries);
     }
 
-    default void debug(Log.Type type, List<Log.Entry> logEntries) {
-        log(Log.Level.DEBUG, type, logEntries);
+    default void info(Log.Category category, Log.Entry... logEntries) {
+        log(Log.Level.INFO, category, logEntries);
     }
 
-    default void info(Log.Type type, Log.Entry... logEntries) {
-        log(Log.Level.INFO, type, logEntries);
+    default void info(Log.Category category, List<Log.Entry> logEntries) {
+        log(Log.Level.INFO, category, logEntries);
     }
 
-    default void info(Log.Type type, List<Log.Entry> logEntries) {
-        log(Log.Level.INFO, type, logEntries);
+    default void warn(Log.Category category, Log.Entry... logEntries) {
+        log(Log.Level.WARN, category, logEntries);
     }
 
-    default void warn(Log.Type type, Log.Entry... logEntries) {
-        log(Log.Level.WARN, type, logEntries);
+    default void warn(Log.Category category, List<Log.Entry> logEntries) {
+        log(Log.Level.WARN, category, logEntries);
     }
 
-    default void warn(Log.Type type, List<Log.Entry> logEntries) {
-        log(Log.Level.WARN, type, logEntries);
+    default void error(Log.Category category, Log.Entry... logEntries) {
+        log(Log.Level.ERROR, category, logEntries);
     }
 
-    default void error(Log.Type type, Log.Entry... logEntries) {
-        log(Log.Level.ERROR, type, logEntries);
+    default void error(Log.Category category, List<Log.Entry> logEntries) {
+        log(Log.Level.ERROR, category, logEntries);
     }
 
-    default void error(Log.Type type, List<Log.Entry> logEntries) {
-        log(Log.Level.ERROR, type, logEntries);
+    default void fatal(Log.Category category, Log.Entry... logEntries) {
+        log(Log.Level.FATAL, category, logEntries);
+    }
+
+    default void fatal(Log.Category category, List<Log.Entry> logEntries) {
+        log(Log.Level.FATAL, category, logEntries);
     }
 
     default Namespaced namespaced(String namespace) {
@@ -83,14 +80,10 @@ public interface Logger {
     }
 
     interface Namespaced {
-        void log(Instant timestamp, Flake flake, Log.Level level, String name, List<Log.Entry> logEntries);
-
-        default void log(Log.Level level, String name, List<Log.Entry> logEntries) {
-            log(Instant.now(), Flake.create(), level, name, logEntries);
-        }
+        void log(Log.Level level, String name, List<Log.Entry> logEntries);
 
         default void log(Log.Level level, String name, Log.Entry... logEntries) {
-            log(Instant.now(), Flake.create(), level, name, List.of(logEntries));
+            log(level, name, List.of(logEntries));
         }
 
         default void log(String name, Log.Entry... logEntries) {
@@ -140,12 +133,20 @@ public interface Logger {
         default void error(String eventType, List<Log.Entry> logEntries) {
             log(Log.Level.ERROR, eventType, logEntries);
         }
+
+        default void fatal(String eventType, Log.Entry... logEntries) {
+            log(Log.Level.FATAL, eventType, logEntries);
+        }
+
+        default void fatal(String eventType, List<Log.Entry> logEntries) {
+            log(Log.Level.FATAL, eventType, logEntries);
+        }
     }
 }
 
 record NamespacedLogger(String namespace, Logger logger) implements Logger.Namespaced {
     @Override
-    public void log(Instant timestamp, Flake flake, Log.Level level, String name, List<Log.Entry> logEntries) {
-        logger.log(timestamp, flake, level, new Log.Type(namespace, name), logEntries);
+    public void log(Log.Level level, String name, List<Log.Entry> logEntries) {
+        logger.log(level, new Log.Category(namespace, name), logEntries);
     }
 }

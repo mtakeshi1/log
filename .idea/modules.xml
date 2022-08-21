@@ -3,8 +3,10 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/dev.mccue.log.alpha/dev.mccue.log.alpha.iml" filepath="$PROJECT_DIR$/dev.mccue.log.alpha/dev.mccue.log.alpha.iml" />
+      <module fileurl="file://$PROJECT_DIR$/dev.mccue.log.alpha.generate/dev.mccue.log.alpha.generate.iml" filepath="$PROJECT_DIR$/dev.mccue.log.alpha.generate/dev.mccue.log.alpha.generate.iml" />
       <module fileurl="file://$PROJECT_DIR$/dev.mccue.log.alpha.main/dev.mccue.log.alpha.main.iml" filepath="$PROJECT_DIR$/dev.mccue.log.alpha.main/dev.mccue.log.alpha.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/dev.mccue.log.alpha.publisher/dev.mccue.log.alpha.publisher.iml" filepath="$PROJECT_DIR$/dev.mccue.log.alpha.publisher/dev.mccue.log.alpha.publisher.iml" />
+      <module fileurl="file://$PROJECT_DIR$/dev.mccue.log.alpha.slf4j/dev.mccue.log.alpha.slf4j.iml" filepath="$PROJECT_DIR$/dev.mccue.log.alpha.slf4j/dev.mccue.log.alpha.slf4j.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/log.iml" filepath="$PROJECT_DIR$/.idea/log.iml" />
     </modules>
   </component>
