@@ -55,7 +55,7 @@ final class SLF4JLogger implements Logger {
     }
 
     private Log.Entry.Value objectToLogValue(Object o) {
-        return switch (o) {
+        return null;/*switch (o) {
             case null -> new Log.Entry.Value.Null();
             case String s -> new Log.Entry.Value.String(s);
             case Boolean b -> new Log.Entry.Value.Boolean(b);
@@ -76,7 +76,7 @@ final class SLF4JLogger implements Logger {
             case List<?> list -> new Log.Entry.Value.List(list.stream().map(this::objectToLogValue).toList());
             case Set<?> set -> new Log.Entry.Value.Set(set.stream().map(this::objectToLogValue).collect(Collectors.toUnmodifiableSet()));
             default -> new Log.Entry.Value.String(o.toString());
-        };
+        };*/
     }
 
     private Log.Entry message(String s) {
@@ -84,7 +84,9 @@ final class SLF4JLogger implements Logger {
     }
 
     private Log.Entry mdc() {
-        return Log.Entry.of(MDC_KEY, MDC.getCopyOfContextMap().entrySet().stream().collect(Collectors.toUnmodifiableMap(
+        var contextMap = MDC.getCopyOfContextMap();
+        contextMap = contextMap == null ? Map.of() : contextMap;
+        return Log.Entry.of(MDC_KEY, contextMap.entrySet().stream().collect(Collectors.toUnmodifiableMap(
                 Map.Entry::getKey,
                 entry -> {
                     var value = entry.getValue();

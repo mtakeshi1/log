@@ -1,4 +1,5 @@
 module dev.mccue.log.alpha.slf4j {
+
     requires org.slf4j;
     requires dev.mccue.log.alpha;
 

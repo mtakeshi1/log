@@ -1,10 +1,11 @@
 import dev.mccue.log.alpha.LoggerFactory;
+import dev.mccue.log.alpha.publisher.GlobalFanOutLogger;
 import dev.mccue.log.alpha.publisher.Publisher;
-import dev.mccue.log.alpha.publisher.FanOutLoggerFactory;
 
 module dev.mccue.log.alpha.publisher {
     uses Publisher;
-    requires dev.mccue.log.alpha;
+    requires transitive dev.mccue.log.alpha;
+    exports dev.mccue.log.alpha.publisher;
 
-    provides LoggerFactory with FanOutLoggerFactory;
+    provides LoggerFactory with GlobalFanOutLogger;
 }

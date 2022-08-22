@@ -25,7 +25,7 @@ package dev.mccue.log.alpha;
  * <p>
  * It is not to be used as a replacement for the wall clock.
  * <p>
- * Another consideration is that buy storing such high precision clock into
+ * Another consideration is that by storing such high precision clock into
  * a Java long field, we reduce the capacity by 1 million.
  * So the latest date that this clock support it will be:
  * <p>

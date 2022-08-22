@@ -14,7 +14,7 @@ public record Log(
         Flake flake,
         Level level,
         Category category,
-        List<Log.Entry> entries
+        List<Entry> entries
 ) {
     /*
      * Should be an extent local, and that is a decent enough thing to be part of the public API.
@@ -31,7 +31,7 @@ public record Log(
             Category category,
             List<Log.Entry> entries
     ) {
-        this(CONTEXT.get(), Thread.currentThread(), Instant.now(), Flake.create(), level, category, entries);
+        this(Context.current(), Thread.currentThread(), Instant.now(), Flake.create(), level, category, entries);
     }
 
     public static <T> T inContext(Supplier<T> code, List<Log.Entry> entries) {
@@ -74,9 +74,6 @@ public record Log(
         inContext(code, List.of(entries));
     }
 
-    /**
-     *
-     */
     public enum Level {
         UNSPECIFIED,
         TRACE,

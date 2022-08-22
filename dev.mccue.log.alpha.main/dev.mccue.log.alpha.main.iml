@@ -10,5 +10,7 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="dev.mccue.log.alpha" />
     <orderEntry type="module" module-name="dev.mccue.log.alpha.generate" />
+    <orderEntry type="module" module-name="dev.mccue.log.alpha.publisher" />
+    <orderEntry type="module" module-name="dev.mccue.log.alpha.console" />
   </component>
 </module>
