@@ -17,7 +17,7 @@ public record Log(
         List<Entry> entries
 ) {
     /*
-     * Should be an extent local, and that is a decent enough thing to be part of the public API.
+     * Should be an extent local.
      */
     private static final ThreadLocal<Context> CONTEXT;
 
@@ -70,7 +70,7 @@ public record Log(
         }
     }
 
-    public static void inContext(Runnable code, Log.Entry entries) {
+    public static void inContext(Runnable code, Log.Entry... entries) {
         inContext(code, List.of(entries));
     }
 
@@ -84,6 +84,9 @@ public record Log(
         FATAL
     }
 
+    /**
+     * Context associated with a Log. This
+     */
     public sealed interface Context {
         static Context current() {
             return CONTEXT.get();

@@ -3,9 +3,13 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/dev.mccue.log.alpha/dev.mccue.log.alpha.iml" filepath="$PROJECT_DIR$/dev.mccue.log.alpha/dev.mccue.log.alpha.iml" />
-      <module fileurl="file://$PROJECT_DIR$/dev.mccue.log.alpha.generate/dev.mccue.log.alpha.generate.iml" filepath="$PROJECT_DIR$/dev.mccue.log.alpha.generate/dev.mccue.log.alpha.generate.iml" />
+      <module fileurl="file://$PROJECT_DIR$/dev.mccue.log.alpha/dev.mccue.log.alpha.bean/dev.mccue.log.alpha.bean.iml" filepath="$PROJECT_DIR$/dev.mccue.log.alpha/dev.mccue.log.alpha.bean/dev.mccue.log.alpha.bean.iml" />
+      <module fileurl="file://$PROJECT_DIR$/dev.mccue.log.alpha.cloudwatch/dev.mccue.log.alpha.cloudwatch.iml" filepath="$PROJECT_DIR$/dev.mccue.log.alpha.cloudwatch/dev.mccue.log.alpha.cloudwatch.iml" />
+      <module fileurl="file://$PROJECT_DIR$/dev.mccue.log.alpha.console/dev.mccue.log.alpha.console.iml" filepath="$PROJECT_DIR$/dev.mccue.log.alpha.console/dev.mccue.log.alpha.console.iml" />
+      <module fileurl="file://$PROJECT_DIR$/init/dev.mccue.log.alpha.generate/dev.mccue.log.alpha.generate.iml" filepath="$PROJECT_DIR$/init/dev.mccue.log.alpha.generate/dev.mccue.log.alpha.generate.iml" />
       <module fileurl="file://$PROJECT_DIR$/dev.mccue.log.alpha.main/dev.mccue.log.alpha.main.iml" filepath="$PROJECT_DIR$/dev.mccue.log.alpha.main/dev.mccue.log.alpha.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/dev.mccue.log.alpha.publisher/dev.mccue.log.alpha.publisher.iml" filepath="$PROJECT_DIR$/dev.mccue.log.alpha.publisher/dev.mccue.log.alpha.publisher.iml" />
+      <module fileurl="file://$PROJECT_DIR$/dev.mccue.log.alpha.sentry/dev.mccue.log.alpha.sentry.iml" filepath="$PROJECT_DIR$/dev.mccue.log.alpha.sentry/dev.mccue.log.alpha.sentry.iml" />
       <module fileurl="file://$PROJECT_DIR$/dev.mccue.log.alpha.slf4j/dev.mccue.log.alpha.slf4j.iml" filepath="$PROJECT_DIR$/dev.mccue.log.alpha.slf4j/dev.mccue.log.alpha.slf4j.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/log.iml" filepath="$PROJECT_DIR$/.idea/log.iml" />
     </modules>

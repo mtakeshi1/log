@@ -12,5 +12,7 @@
     <orderEntry type="module" module-name="dev.mccue.log.alpha.generate" />
     <orderEntry type="module" module-name="dev.mccue.log.alpha.publisher" />
     <orderEntry type="module" module-name="dev.mccue.log.alpha.console" />
+    <orderEntry type="module" module-name="dev.mccue.log.alpha.sentry" />
+    <orderEntry type="module" module-name="dev.mccue.log.alpha.record" />
   </component>
 </module>
