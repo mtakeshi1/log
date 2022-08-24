@@ -14,5 +14,7 @@
     <orderEntry type="module" module-name="dev.mccue.log.alpha.console" />
     <orderEntry type="module" module-name="dev.mccue.log.alpha.sentry" />
     <orderEntry type="module" module-name="dev.mccue.log.alpha.record" />
+    <orderEntry type="library" name="external-modules (2)" level="project" />
+    <orderEntry type="module" module-name="dev.mccue.log.alpha.slf4j" />
   </component>
 </module>

@@ -33,6 +33,8 @@ public final class AnnotationProcessor extends AbstractProcessor {
             var typeElement = (TypeElement) element;
             var className = typeElement.getSimpleName();
 
+            var annotation = typeElement.getAnnotation(DeriveLogger.class);
+
             var topElement = typeElement.getEnclosingElement();
             while (!(topElement instanceof PackageElement packageElement)) {
                 topElement = topElement.getEnclosingElement();
@@ -58,7 +60,7 @@ public final class AnnotationProcessor extends AbstractProcessor {
             var classDecl = new StringBuilder();
             classDecl.append(packageDecl);
             classDecl.append(classDeclStart);
-            classDecl.append("    static dev.mccue.log.alpha.Logger.Namespaced log =");
+            classDecl.append("    static dev.mccue.log.alpha.Logger.Namespaced %s =".formatted(annotation.fieldName()));
             classDecl.append("\n         dev.mccue.log.alpha.LoggerFactory.getLogger(%s.class);\n".formatted(typeElement.getQualifiedName()));
             classDecl.append(classDeclEnd);
 

@@ -1,9 +1,16 @@
 package dev.mccue.log.alpha;
 
-import java.time.Instant;
 import java.util.List;
 
+/**
+ * A logger.
+ */
 public interface Logger {
+    /**
+     * Logs the log.
+     *
+     * @param log The log to log.
+     */
     void log(Log log);
 
     default void log(
@@ -67,18 +74,19 @@ public interface Logger {
         log(Log.Level.ERROR, category, logEntries);
     }
 
-    default void fatal(Log.Category category, Log.Entry... logEntries) {
-        log(Log.Level.FATAL, category, logEntries);
-    }
-
-    default void fatal(Log.Category category, List<Log.Entry> logEntries) {
-        log(Log.Level.FATAL, category, logEntries);
-    }
-
+    /**
+     * @param namespace The namespace for log categories.
+     * @return A namespaced logger wrapping this one.
+     */
     default Namespaced namespaced(String namespace) {
         return new NamespacedLogger(namespace, this);
     }
 
+    /**
+     * A logger with the namespace of its category already filled in.
+     *
+     * <p>The most common use of this is to have a logger for a particular class.</p>
+     */
     interface Namespaced {
         void log(Log.Level level, String name, List<Log.Entry> logEntries);
 
@@ -132,14 +140,6 @@ public interface Logger {
 
         default void error(String eventType, List<Log.Entry> logEntries) {
             log(Log.Level.ERROR, eventType, logEntries);
-        }
-
-        default void fatal(String eventType, Log.Entry... logEntries) {
-            log(Log.Level.FATAL, eventType, logEntries);
-        }
-
-        default void fatal(String eventType, List<Log.Entry> logEntries) {
-            log(Log.Level.FATAL, eventType, logEntries);
         }
     }
 }

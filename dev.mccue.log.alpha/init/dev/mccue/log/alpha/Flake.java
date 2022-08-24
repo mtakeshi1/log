@@ -41,7 +41,7 @@ import java.util.concurrent.ThreadLocalRandom;
  * if `flake1 < flake2` then `flake1.toString() < flake2.toString()`
  * Internally it uses a NON STANDARD base64 encoding to preserve the ordering.
  * Unfortunately, the standard Base64 encoding doesn't preserve this property
- * as defined in https://en.wikipedia.org/wiki/Base64.
+ * as defined in <a href="https://en.wikipedia.org/wiki/Base64">https://en.wikipedia.org/wiki/Base64</a>.
  * <p>
  * - **Web-safe string representation**
  * The string representation uses only characters which are web-safe and can
@@ -146,7 +146,7 @@ public final class Flake implements Comparable<Flake> {
      * <p>
      * It also uses a set of characters which can be safely used in a web
      * context without requiring URL encoding as defined by:
-     * https://tools.ietf.org/html/rfc3986#section-2.3
+     * <a href="https://tools.ietf.org/html/rfc3986#section-2.3">https://tools.ietf.org/html/rfc3986#section-2.3</a>
      * <p>
      * We use 64 characters because it is a natural power of 2.
      * To represent 64 combination we need 6 bits. Therefore

@@ -9,5 +9,6 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="dev.mccue.log.alpha" />
+    <orderEntry type="library" name="external-modules (2)" level="project" />
   </component>
 </module>

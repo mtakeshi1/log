@@ -5,6 +5,7 @@ import dev.mccue.log.alpha.LoggerFactory;
 import org.slf4j.*;
 import org.slf4j.helpers.BasicMDCAdapter;
 import org.slf4j.helpers.BasicMarkerFactory;
+import org.slf4j.helpers.MessageFormatter;
 import org.slf4j.spi.MDCAdapter;
 import org.slf4j.spi.SLF4JServiceProvider;
 
@@ -32,7 +33,7 @@ public final class SLF4JAdapter implements SLF4JServiceProvider {
 
     @Override
     public String getRequestedApiVersion() {
-        return "0.0.1";
+        return "2.0";
     }
 
     @Override
@@ -55,14 +56,14 @@ final class SLF4JLogger implements Logger {
     }
 
     private Log.Entry.Value objectToLogValue(Object o) {
-        return null;/*switch (o) {
-            case null -> new Log.Entry.Value.Null();
+        return new Log.Entry.Value.Lazy(() -> switch (o) {
+            case null -> Log.Entry.Value.Null.INSTANCE;
             case String s -> new Log.Entry.Value.String(s);
             case Boolean b -> new Log.Entry.Value.Boolean(b);
             case Byte b -> new Log.Entry.Value.Byte(b);
-            case Character c -> new Log.Entry.Value.Char(c);
+            case Character c -> new Log.Entry.Value.Character(c);
             case Short s -> new Log.Entry.Value.Short(s);
-            case Integer i -> new Log.Entry.Value.Int(i);
+            case Integer i -> new Log.Entry.Value.Integer(i);
             case Long l -> new Log.Entry.Value.Long(l);
             case Double d -> new Log.Entry.Value.Double(d);
             case UUID uuid -> new Log.Entry.Value.UUID(uuid);
@@ -76,7 +77,7 @@ final class SLF4JLogger implements Logger {
             case List<?> list -> new Log.Entry.Value.List(list.stream().map(this::objectToLogValue).toList());
             case Set<?> set -> new Log.Entry.Value.Set(set.stream().map(this::objectToLogValue).collect(Collectors.toUnmodifiableSet()));
             default -> new Log.Entry.Value.String(o.toString());
-        };*/
+        });
     }
 
     private Log.Entry message(String s) {
@@ -85,21 +86,35 @@ final class SLF4JLogger implements Logger {
 
     private Log.Entry mdc() {
         var contextMap = MDC.getCopyOfContextMap();
-        contextMap = contextMap == null ? Map.of() : contextMap;
-        return Log.Entry.of(MDC_KEY, contextMap.entrySet().stream().collect(Collectors.toUnmodifiableMap(
-                Map.Entry::getKey,
-                entry -> {
-                    var value = entry.getValue();
-                    return value == null ? new Log.Entry.Value.Null() : new Log.Entry.Value.String(value);
-                }
-        )));
+        if (contextMap == null) {
+            return Log.Entry.of(MDC_KEY, Map.of());
+        }
+        else {
+            return Log.Entry.of(MDC_KEY, contextMap.entrySet()
+                    .stream()
+                    .collect(Collectors.toUnmodifiableMap(
+                            entry -> {
+                                var key = entry.getKey();
+                                return key == null ?
+                                        Log.Entry.Value.Null.INSTANCE :
+                                        new Log.Entry.Value.String(key);
+                            },
+                            entry -> {
+                                var value = entry.getValue();
+                                return value == null ?
+                                        Log.Entry.Value.Null.INSTANCE :
+                                        new Log.Entry.Value.String(value);
+                            })
+                    )
+            );
+        }
     }
 
     private static final Log.Entry NO_ARGS = Log.Entry.of(ARGUMENTS_KEY, List.of());
 
     @Override
     public String getName() {
-        return SLF4JLogger.class.getName();
+        return this.category.namespace();
     }
 
     @Override
@@ -114,19 +129,26 @@ final class SLF4JLogger implements Logger {
 
     @Override
     public void trace(String s, Object o) {
-        log.trace(this.category, message(s), Log.Entry.of(ARGUMENTS_KEY, List.of(objectToLogValue(o))), mdc());
+        MessageFormatter.format(s, o);
+        log.trace(
+                this.category,
+                message(s),
+                Log.Entry.of(ARGUMENTS_KEY, List.of(objectToLogValue(o))),
+                mdc()
+        );
     }
 
     @Override
     public void trace(String s, Object o, Object o1) {
-        log.trace(this.category, message(s), Log.Entry.of(
+        log.trace(this.category, message(s),
+                Log.Entry.of(
                 ARGUMENTS_KEY,
                 List.of(objectToLogValue(o), objectToLogValue(o1))), mdc());
     }
 
     @Override
     public void trace(String s, Object... objects) {
-        log.trace(this.category, message(s), new Log.Entry(ARGUMENTS_KEY, objectToLogValue(Arrays.asList(objects))), mdc());
+        log.trace(this.category, message(s),new Log.Entry(ARGUMENTS_KEY, objectToLogValue(Arrays.asList(objects))), mdc());
     }
 
     @Override
@@ -296,22 +318,22 @@ final class SLF4JLogger implements Logger {
 
     @Override
     public void warn(String s, Object o) {
-
-    }
-
-    @Override
-    public void warn(String s, Object... objects) {
-
+        log.warn(this.category, message(s), Log.Entry.of(ARGUMENTS_KEY, List.of(objectToLogValue(o))), mdc());
     }
 
     @Override
     public void warn(String s, Object o, Object o1) {
+        log.warn(this.category, message(s), Log.Entry.of(ARGUMENTS_KEY, List.of(objectToLogValue(o), objectToLogValue(o1))), mdc());
+    }
 
+    @Override
+    public void warn(String s, Object... objects) {
+        log.warn(this.category, message(s), new Log.Entry(ARGUMENTS_KEY, objectToLogValue(Arrays.asList(objects))), mdc());
     }
 
     @Override
     public void warn(String s, Throwable throwable) {
-
+        log.warn(this.category, message(s), Log.Entry.of(ARGUMENTS_KEY, List.of(objectToLogValue(throwable))), mdc());
     }
 
     @Override
@@ -321,27 +343,27 @@ final class SLF4JLogger implements Logger {
 
     @Override
     public void warn(Marker marker, String s) {
-        log.warn(this.category, message(s), NO_ARGS, mdc());
+        warn(s);
     }
 
     @Override
     public void warn(Marker marker, String s, Object o) {
-
+        warn(s, o);
     }
 
     @Override
     public void warn(Marker marker, String s, Object o, Object o1) {
-
+        warn(s, o, o1);
     }
 
     @Override
     public void warn(Marker marker, String s, Object... objects) {
-
+        warn(s, objects);
     }
 
     @Override
     public void warn(Marker marker, String s, Throwable throwable) {
-
+        warn(s, throwable);
     }
 
     @Override
@@ -356,22 +378,22 @@ final class SLF4JLogger implements Logger {
 
     @Override
     public void error(String s, Object o) {
-
+        log.error(this.category, message(s), Log.Entry.of(ARGUMENTS_KEY, List.of(objectToLogValue(o))), mdc());
     }
 
     @Override
     public void error(String s, Object o, Object o1) {
-
+        log.error(this.category, message(s), Log.Entry.of(ARGUMENTS_KEY, List.of(objectToLogValue(o), objectToLogValue(o1))), mdc());
     }
 
     @Override
     public void error(String s, Object... objects) {
-
+        log.error(this.category, message(s), new Log.Entry(ARGUMENTS_KEY, objectToLogValue(Arrays.asList(objects))), mdc());
     }
 
     @Override
     public void error(String s, Throwable throwable) {
-
+        log.error(this.category, message(s), Log.Entry.of(ARGUMENTS_KEY, List.of(objectToLogValue(throwable))), mdc());
     }
 
     @Override
@@ -381,26 +403,26 @@ final class SLF4JLogger implements Logger {
 
     @Override
     public void error(Marker marker, String s) {
-        log.error(this.category, message(s), NO_ARGS, mdc());
+        error(s);
     }
 
     @Override
     public void error(Marker marker, String s, Object o) {
-
+        error(s, o);
     }
 
     @Override
     public void error(Marker marker, String s, Object o, Object o1) {
-
+        error(s, o, o1);
     }
 
     @Override
     public void error(Marker marker, String s, Object... objects) {
-
+        error(s, objects);
     }
 
     @Override
     public void error(Marker marker, String s, Throwable throwable) {
-
+        error(s, throwable);
     }
 }

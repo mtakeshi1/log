@@ -19,9 +19,9 @@ public final class SentryPublisher implements Publisher {
                 var throwables = new ArrayList<Throwable>();
                 var values = new ArrayDeque<>(log.entries().stream().map(Log.Entry::value).toList());
                 var ctx = log.context();
-                while (ctx instanceof Log.Context.NotEmpty notEmptyCtx) {
-                    values.addAll(notEmptyCtx.entries().stream().map(Log.Entry::value).toList());
-                    ctx = notEmptyCtx.parent();
+                while (ctx instanceof Log.Context.Child childCtx) {
+                    values.addAll(childCtx.entries().stream().map(Log.Entry::value).toList());
+                    ctx = childCtx.parent();
                 }
                 while (!values.isEmpty()) {
                     var value = values.pop();

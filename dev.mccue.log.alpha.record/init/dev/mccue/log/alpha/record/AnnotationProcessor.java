@@ -96,7 +96,6 @@ public final class AnnotationProcessor extends AbstractProcessor {
                 case INFO -> "info";
                 case WARN -> "warn";
                 case ERROR -> "error";
-                case FATAL -> "fatal";
             };
             var params =                     typeElement.getRecordComponents()
                     .stream()
@@ -107,7 +106,6 @@ public final class AnnotationProcessor extends AbstractProcessor {
                                     recordComponent.getSimpleName()
                             ))
                     .collect(Collectors.joining(",\n"));
-
             logMethod = logMethod.formatted(
                     methodName, params,
                     methodName, params
