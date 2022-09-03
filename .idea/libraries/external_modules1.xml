@@ -1,0 +1,10 @@
+<component name="libraryTable">
+  <library name="external-modules1">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/.bach/external-modules/org.slf4j.jar!/" />
+      <root url="jar://$PROJECT_DIR$/.bach/external-modules/disruptor-3.4.4.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

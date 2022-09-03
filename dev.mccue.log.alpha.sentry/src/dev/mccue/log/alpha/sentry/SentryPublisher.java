@@ -15,7 +15,7 @@ public final class SentryPublisher implements Publisher {
     @Override
     public void publish(List<dev.mccue.log.alpha.Log> logs) {
         for (var log : logs) {
-            if (log.level() == Log.Level.WARN || log.level() == Log.Level.ERROR || log.level() == Log.Level.UNSPECIFIED) {
+            if (log.level() == Log.Level.WARN || log.level() == Log.Level.ERROR) {
                 var throwables = new ArrayList<Throwable>();
                 var values = new ArrayDeque<>(log.entries().stream().map(Log.Entry::value).toList());
                 var ctx = log.context();

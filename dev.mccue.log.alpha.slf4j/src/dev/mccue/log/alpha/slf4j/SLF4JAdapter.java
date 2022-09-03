@@ -5,7 +5,6 @@ import dev.mccue.log.alpha.LoggerFactory;
 import org.slf4j.*;
 import org.slf4j.helpers.BasicMDCAdapter;
 import org.slf4j.helpers.BasicMarkerFactory;
-import org.slf4j.helpers.MessageFormatter;
 import org.slf4j.spi.MDCAdapter;
 import org.slf4j.spi.SLF4JServiceProvider;
 
@@ -76,6 +75,7 @@ final class SLF4JLogger implements Logger {
             case Throwable t -> new Log.Entry.Value.Throwable(t);
             case List<?> list -> new Log.Entry.Value.List(list.stream().map(this::objectToLogValue).toList());
             case Set<?> set -> new Log.Entry.Value.Set(set.stream().map(this::objectToLogValue).collect(Collectors.toUnmodifiableSet()));
+            case Log.Entry.Value v -> v;
             default -> new Log.Entry.Value.String(o.toString());
         });
     }
@@ -129,7 +129,6 @@ final class SLF4JLogger implements Logger {
 
     @Override
     public void trace(String s, Object o) {
-        MessageFormatter.format(s, o);
         log.trace(
                 this.category,
                 message(s),

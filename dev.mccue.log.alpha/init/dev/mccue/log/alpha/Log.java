@@ -10,64 +10,191 @@ import java.util.stream.Collectors;
 public record Log(
         Context context,
         Thread thread,
-        Instant timestamp,
+        Occurrence occurrence,
         Flake flake,
         Level level,
         Category category,
         List<Entry> entries
 ) implements Iterable<Log.Entry>  {
-    /*
-     * Should be an extent local.
-     */
-    private static final AtomicReference<ThreadLocal<Context>> CONTEXT_REFERENCE =
-            new AtomicReference<>(ThreadLocal.withInitial(() -> Context.Global.EMPTY));
+    sealed interface Occurrence {
+        record PointInTime(java.time.Instant happenedAt) implements Occurrence {}
+        record SpanOfTime(java.time.Instant startedAt, java.time.Duration lasted) implements Occurrence {}
+    }
+    public Log(
+            Context context,
+            Thread thread,
+            Occurrence occurrence,
+            Flake flake,
+            Level level,
+            Category category,
+            List<Entry> entries
+    )  {
+        this.context = Objects.requireNonNull(context, "context must not be null");
+        this.thread = Objects.requireNonNull(thread, "thread must not be null");
+        this.occurrence = Objects.requireNonNull(occurrence, "timestamp must not be null");
+        this.flake = Objects.requireNonNull(flake, "flake must not be null");
+        this.level = Objects.requireNonNull(level, "level must not be null");
+        this.category = Objects.requireNonNull(category, "category must not be null");
+        this.entries = List.copyOf(Objects.requireNonNull(entries, "entries must not be null"));
+    }
 
+    private static final AtomicReference<Context.Global> GLOBAL_CONTEXT =
+            new AtomicReference<>(Context.Global.EMPTY);
+
+    /*
+     * This should be an extent local when it is possible to be so.
+     */
+    private static final ThreadLocal<Context.Child> LOCAL_CONTEXT = new ThreadLocal<>();
+
+    /**
+     * Constructs a log defaulting to the current lexical context, the current thread, the current time,
+     * and a newly generated flake.
+     *
+     * @param level The level of the log.
+     * @param category The category of the log.
+     * @param entries The entries to include in the log.
+     */
     public Log(
             Level level,
             Category category,
             List<Log.Entry> entries
     ) {
-        this(Context.current(), Thread.currentThread(), Instant.now(), Flake.create(), level, category, entries);
+        this(Context.current(), Thread.currentThread(), new Occurrence.PointInTime(Instant.now()), Flake.create(), level, category, entries);
     }
 
-    public static <T> T withContext(Supplier<T> code, List<Log.Entry> entries) {
-        var context = CONTEXT_REFERENCE.get();
-        var original = context.get();
+
+    /**
+     * Takes a list of log entries and executes a block of code where those entries will
+     * be added to any logs.
+     *
+     * <p>Context is not propagated across threads at this time.</p>
+     *
+     * {@snippet :
+     * var response = Log.withContext(
+     *         List.of(
+     *                 Log.Entry.of("request-id", UUID.randomUUID()),
+     *                 Log.Entry.of("user-id", userId)
+     *         ),
+     *         () -> {
+     *             var user = lookupUser(userId);
+     *             if (user == null) {
+     *                 // Will have the context of the request being made;
+     *                 log.info("no-user-found");
+     *                 return fourOhFour();
+     *             }
+     *             else {
+     *                 log.info("found-user", Log.Entry.of("name", user.name()));
+     *                 return success();
+     *             }
+     *         }
+     * );
+     * }
+     *
+     * <p>If the block of code being executed contains checked exceptions, then the two
+     * options available are to either re-throw as runtime exceptions or wrap them into
+     * the return value.</p>
+     *
+     * <p> The first option will look something like this. </p>
+     * {@snippet :
+     * var favoriteNumber = Log.withContext(
+     *     List.of(Log.Entry.of("person", "bob")),
+     *     () -> {
+     *         try {
+     *             return Integer.parseInt(Files.readString(Path.of("favorite.txt")));
+     *         }
+     *         catch (IOException e) {
+     *             throw new UncheckedIOException(e);
+     *         }
+     *     }
+     * );
+     * }
+     *
+     * <p> And the second something like this. </p>
+     *
+     * {@snippet :
+     * sealed interface FavoriteNumberResult {
+     *     record GotNumber(int number) implements FavoriteNumberResult {}
+     *     record FailedToReadFile(IOException e) implements FavoriteNumberResult {}
+     * }
+     *
+     * var result = Log.withContext(
+     *     List.of(Log.Entry.of("person", "bob")),
+     *     () -> {
+     *         try {
+     *             return Integer.parseInt(Files.readString(Path.of("favorite.txt")));
+     *         }
+     *         catch (IOException e) {
+     *             throw new UncheckedIOException(e);
+     *         }
+     *     }
+     * );
+     *
+     * if (result instanceof FavoriteNumberResult.FailedToReadFile failedToReadFile) {
+     *     throw failedToReadFile.e();
+     * }
+     *}
+     *
+     * <p>While the second is more verbose and quite unsavory without destructuring pattern match, it does let you
+     * bubble exceptions unaltered if that context matters for the purposes of your computation.</p>
+     *
+     * @param entries The log entries to add
+     * @param code The block of code to execute.
+     * @return The result of the execution of the block of code.
+     * @param <T> The type returned by the block of code.
+     */
+    public static <T> T withContext(List<Log.Entry> entries, Supplier<T> code) {
+        var localContext = LOCAL_CONTEXT.get();
         try {
-            context.set(new Context.Child(
+            LOCAL_CONTEXT.set(new Context.Child(
                     Thread.currentThread(),
                     Instant.now(),
                     Flake.create(),
                     entries,
-                    original
+                    localContext == null ? GLOBAL_CONTEXT.get() : localContext
             ));
             return code.get();
         } finally {
-            context.set(original);
+            LOCAL_CONTEXT.set(localContext);
         }
     }
 
-    public static <T> T withContext(Supplier<T> code, Log.Entry... entries) {
-        return withContext(code, List.of(entries));
+    /**
+     * Variant of withContext that doesn't produce a value.
+     *
+     * @see Log#withContext(List, Supplier)
+     * @param entries The log entries to add.
+     * @param code The block of code to execute.
+     */
+    public static void withContext(List<Log.Entry> entries, Runnable code) {
+        withContext(
+                entries,
+                () -> {
+                    code.run();
+                    return null;
+                });
     }
 
-    public static void withContext(Runnable code, List<Log.Entry> entries) {
-        withContext(() -> {
-            code.run();
-            return null;
-        }, entries);
-    }
-
-    public static void withContext(Runnable code, Log.Entry... entries) {
-        withContext(code, List.of(entries));
-    }
-
+    /**
+     * Sets the global context for the program.
+     *
+     * <p>The intent is for this to be used for truly global things such as
+     * machine info or info about the running app.</p>
+     *
+     * {@snippet :
+     * Log.setGlobalContext(
+     *     Log.Entry.of("app-name", "demo-app"),
+     *     Log.Entry.of("version", "0.0.1")
+     * );
+     * }
+     *
+     * <p>When used inside of a block of code running in {@link Log#withContext(List, Supplier)}
+     * or in parallel to code running in such a context, the global context of those already running
+     * scopes will not be affected. In that sense it is "safe" to call from multiple threads.</p>
+     *
+     * @param entries The log entries to add to the global context.
+     */
     public static void setGlobalContext(List<Log.Entry> entries) {
-        var entriesClone = List.copyOf(entries);
-        CONTEXT_REFERENCE.set(ThreadLocal.withInitial(() -> new Context.Global(entriesClone)));
-    }
-    public static void setGlobalContext(Log.Entry... entries) {
-        setGlobalContext(Arrays.asList(entries));
+        GLOBAL_CONTEXT.set(new Context.Global(entries));
     }
 
     /**
@@ -125,7 +252,6 @@ public record Log(
     }
 
     public enum Level {
-        UNSPECIFIED,
         TRACE,
         DEBUG,
         INFO,
@@ -135,10 +261,14 @@ public record Log(
 
     public sealed interface Context {
         static Context current() {
-            return CONTEXT_REFERENCE.get().get();
+            var localContext = LOCAL_CONTEXT.get();
+            return localContext == null ? GLOBAL_CONTEXT.get() : localContext;
         }
 
         record Global(List<Log.Entry> entries) implements Context {
+            public Global(List<Log.Entry> entries) {
+                this.entries = List.copyOf(Objects.requireNonNull(entries, "entries must not be null"));
+            }
             static final Global EMPTY = new Global(List.of());
         }
 
@@ -149,10 +279,27 @@ public record Log(
                 List<Log.Entry> entries,
                 Context parent
         ) implements Context {
+            public Child(
+                    Thread thread,
+                    Instant timestamp,
+                    Flake flake,
+                    List<Log.Entry> entries,
+                    Context parent
+            ) {
+                this.thread = Objects.requireNonNull(thread, "thread must not be null");
+                this.timestamp = Objects.requireNonNull(timestamp, "timestamp must not be null");
+                this.flake = Objects.requireNonNull(flake, "flake must not be null");
+                this.entries = List.copyOf(Objects.requireNonNull(entries, "entries must not be null"));
+                this.parent = Objects.requireNonNull(parent, "parent must not be null");
+            }
         }
     }
 
     public record Category(String namespace, String name) {
+        public Category {
+            Objects.requireNonNull(namespace, "namespace must not be null.");
+            Objects.requireNonNull(name, "name must not be null.");
+        }
     }
 
     public record Entry(String key, Value value) {
@@ -164,7 +311,7 @@ public record Log(
         }
 
         public static Entry of(String key, String value) {
-            return new Entry(key, value == null ? Value.Null.INSTANCE : new Value.String(value));
+            return of(key, value, Value.String::new);
         }
 
         public static Entry of(String key, boolean value) {
@@ -189,6 +336,10 @@ public record Log(
 
         public static Entry of(String key, long value) {
             return new Entry(key, new Value.Long(value));
+        }
+
+        public static Entry of(String key, float value) {
+            return new Entry(key, new Value.Double(value));
         }
 
         public static Entry of(String key, double value) {
@@ -277,7 +428,10 @@ public record Log(
         }
 
         public static <T> Entry ofLazy(String key, T value, Function<T, Value> toValue) {
-            return new Entry(key, new Value.Lazy(() -> toValue.apply(value)));
+            return new Entry(key, new Value.Lazy(() -> {
+                var v = toValue.apply(value);
+                return v == null ? Value.Null.INSTANCE : v;
+            }));
         }
 
         /**
@@ -358,6 +512,14 @@ public record Log(
             }
 
             /**
+             * A float.
+             *
+             * @param value A wrapped float.
+             */
+            record Float(float value) implements Value {
+            }
+
+            /**
              * A double.
              *
              * @param value A wrapped double.
@@ -382,12 +544,9 @@ public record Log(
             /**
              * A URI.
              *
-             * @param value A wrapped {@link java.net.URI}.
+             * @param value A wrapped {@link java.net.URI}. Must not be null.
              */
             record URI(java.net.URI value) implements Value {
-                /**
-                 * @param value The {@link java.net.URI} being wrapped. Must not be null.
-                 */
                 public URI {
                     Objects.requireNonNull(value, "value must not be null");
                 }
@@ -396,12 +555,9 @@ public record Log(
             /**
              * An instant in time.
              *
-             * @param value A wrapped {@link java.time.Instant}.
+             * @param value A wrapped {@link java.time.Instant}. Must not be null.
              */
             record Instant(java.time.Instant value) implements Value {
-                /**
-                 * @param value The {@link java.time.Instant} being wrapped. Must not be null.
-                 */
                 public Instant {
                     Objects.requireNonNull(value, "value must not be null");
                 }
@@ -410,26 +566,20 @@ public record Log(
             /**
              * A local date-time.
              *
-             * @param value A wrapped {@link java.time.LocalDateTime}.
+             * @param value A wrapped {@link java.time.LocalDateTime}. Must not be null.
              */
             record LocalDateTime(java.time.LocalDateTime value) implements Value {
-                /**
-                 * @param value The {@link java.time.LocalDateTime} being wrapped. Must not be null.
-                 */
                 public LocalDateTime {
                     Objects.requireNonNull(value, "value must not be null");
                 }
             }
 
             /**
-             * A local date without a time component.
+             * A local date without a time component. Must not be null.
              *
              * @param value A wrapped {@link java.time.LocalDate}.
              */
             record LocalDate(java.time.LocalDate value) implements Value {
-                /**
-                 * @param value The {@link java.time.LocalDate} being wrapped. Must not be null.
-                 */
                 public LocalDate {
                     Objects.requireNonNull(value, "value must not be null");
                 }
@@ -556,7 +706,6 @@ public record Log(
                 private volatile Supplier<? extends Value> supplier;
                 private Value value;
 
-
                 /**
                  * Constructs a Lazy value from the given supplier.
                  *
@@ -592,7 +741,7 @@ public record Log(
 
                 @Override
                 public java.lang.String toString() {
-                    if (supplier == null) {
+                    if (supplier != null) {
                         return "Lazy[pending]";
                     }
                     else {

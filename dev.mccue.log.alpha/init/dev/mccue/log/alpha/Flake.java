@@ -21,7 +21,7 @@ import java.util.concurrent.ThreadLocalRandom;
  * monotonic clock as part of the generation, therefore Flakes
  * created across processes/machines might suffer from clock skew
  * and hard reset.  Generally the following condition should apply
- * for all Flakes `flake0 < flake1 < flake2 < ... < flakeN`
+ * for all Flakes `flake0 &lt; flake1 &lt; flake2 &lt; ... &lt; flakeN`
  * <p>
  * - **Two components: one time-based (64 bits), one random (128 bits)**
  * The most significant bits are time based and they use a monotonic
@@ -38,7 +38,7 @@ import java.util.concurrent.ThreadLocalRandom;
  * Whether you choose to have a bytes representation or string representation
  * it uses an encoding which maintain the ordering.
  * Which it means that:
- * if `flake1 < flake2` then `flake1.toString() < flake2.toString()`
+ * if `flake1 < flake2` then `flake1.toString() &lt; flake2.toString()`
  * Internally it uses a NON STANDARD base64 encoding to preserve the ordering.
  * Unfortunately, the standard Base64 encoding doesn't preserve this property
  * as defined in <a href="https://en.wikipedia.org/wiki/Base64">https://en.wikipedia.org/wiki/Base64</a>.

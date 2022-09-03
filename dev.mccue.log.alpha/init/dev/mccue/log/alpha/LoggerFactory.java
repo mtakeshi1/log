@@ -1,10 +1,10 @@
 package dev.mccue.log.alpha;
 
-import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.ServiceLoader;
 import java.util.concurrent.ThreadLocalRandom;
 
+@FunctionalInterface
 public interface LoggerFactory {
     static LoggerFactory create() {
         var loggerFactories = ServiceLoader.load(LoggerFactory.class).iterator();
@@ -39,10 +39,6 @@ public interface LoggerFactory {
 
     static Logger.Namespaced getLogger(Class<?> klass) {
         return getLogger().namespaced(klass.getCanonicalName());
-    }
-
-    static Logger.Namespaced getLogger(MethodHandles.Lookup lookup) {
-        return getLogger(lookup.lookupClass());
     }
 
     Logger createLogger();

@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="modules">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/.bach/out/init/modules/dev.mccue.log.alpha.record.jar!/" />
+      <root url="jar://$PROJECT_DIR$/.bach/out/init/modules/dev.mccue.log.alpha.jar!/" />
+      <root url="jar://$PROJECT_DIR$/.bach/out/init/modules/dev.mccue.log.alpha.generate.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

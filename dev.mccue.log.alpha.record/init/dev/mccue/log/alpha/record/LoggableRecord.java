@@ -22,7 +22,7 @@ public @interface LoggableRecord {
     boolean useTypeSafeCast() default false;
 
     /**
-     * @return The log level that the record should log at. Defaults to unspecified.
+     * @return The log level that the record should log at. Defaults to info.
      */
-    Log.Level defaultLogLevel() default Log.Level.UNSPECIFIED;
+    Log.Level defaultLogLevel() default Log.Level.INFO;
 }

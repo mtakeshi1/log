@@ -49,10 +49,7 @@ public final class ConsolePublisher implements Publisher {
             System.out.println(log);
             synchronized (System.out) {
                 /*System.out.print("[");
-                System.out.print(switch (log.level()) {
-                    case UNSPECIFIED -> "?";
-                    default -> log.level().toString();
-                });
+                System.out.print(switch (log.level().toString());
                 System.out.print(" ");
                 System.out.print(log.thread());
                 System.out.print("]: ");
@@ -70,10 +67,7 @@ public final class ConsolePublisher implements Publisher {
 
                 System.out.print("{");
                 System.out.print("\"log/level\":");
-                System.out.print(switch (log.level()) {
-                    case UNSPECIFIED -> "\"unspecified\"";
-                    default -> jsonify.apply(log.level().toString());
-                });
+                System.out.print(jsonify.apply(log.level().toString()));
                 System.out.print(",\"log/thread\":");
                 System.out.print(jsonify.apply(log.thread().getName()));
                 System.out.print(",\"log/namespace\":");

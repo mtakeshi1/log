@@ -90,7 +90,6 @@ public final class AnnotationProcessor extends AbstractProcessor {
                         }
                     """;
             var methodName = switch (annotation.defaultLogLevel()) {
-                case UNSPECIFIED -> "log";
                 case TRACE -> "trace";
                 case DEBUG -> "debug";
                 case INFO -> "info";
