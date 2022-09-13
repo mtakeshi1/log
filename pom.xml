@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>dev.mccue</groupId>
+    <artifactId>log-parent</artifactId>
+    <version>0.0.1</version>
+    <packaging>pom</packaging>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
+    <modules>
+        <module>log.alpha</module>
+        <module>log.alpha.slf4j</module>
+        <module>log.alpha.publisher</module>
+        <module>log.alpha.main</module>
+        <module>log.alpha.generate</module>
+        <module>log.alpha.bean</module>
+        <module>log.alpha.cloudwatch</module>
+        <module>log.alpha.jackson</module>
+        <module>log.alpha.simplejsonlogger</module>
+    </modules>
+</project>
