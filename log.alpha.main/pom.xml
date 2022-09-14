@@ -3,11 +3,12 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-
-    <groupId>dev.mccue</groupId>
+    <parent>
+        <groupId>dev.mccue</groupId>
+        <artifactId>log-parent</artifactId>
+        <version>0.0.1-SNAPSHOT</version>
+    </parent>
     <artifactId>log.alpha.main</artifactId>
-    <version>0.0.1</version>
-    <packaging>jar</packaging>
 
     <properties>
         <maven.deploy.skip>true</maven.deploy.skip>
@@ -17,24 +18,22 @@
         <dependency>
             <groupId>dev.mccue</groupId>
             <artifactId>log.alpha</artifactId>
-            <version>0.0.1</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>dev.mccue</groupId>
             <artifactId>log.alpha.cloudwatch</artifactId>
-            <version>0.0.1</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>dev.mccue</groupId>
             <artifactId>log.alpha.generate</artifactId>
-            <version>0.0.1</version>
-            <scope>compile</scope>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>dev.mccue</groupId>
             <artifactId>log.alpha.simplejsonlogger</artifactId>
-            <version>0.0.1</version>
-            <scope>compile</scope>
+            <version>${project.version}</version>
         </dependency>
     </dependencies>
 
@@ -51,33 +50,6 @@
                 </configuration>
             </plugin>
 
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-source-plugin</artifactId>
-                <version>3.0.1</version>
-                <executions>
-                    <execution>
-                        <id>attach-sources</id>
-                        <goals>
-                            <goal>jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <version>3.2.0</version>
-                <executions>
-                    <execution>
-                        <id>attach-javadocs</id>
-                        <goals>
-                            <goal>jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
         </plugins>
     </build>
 </project>
