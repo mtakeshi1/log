@@ -21,7 +21,6 @@
         <module>log.alpha.publisher</module>
         <module>log.alpha.main</module>
         <module>log.alpha.generate</module>
-        <module>log.alpha.bean</module>
         <module>log.alpha.cloudwatch</module>
         <module>log.alpha.jackson</module>
         <module>log.alpha.simplejsonlogger</module>
