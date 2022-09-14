@@ -1,13 +1,16 @@
 package dev.mccue.log.alpha.main;
 
 import dev.mccue.log.alpha.Log;
+import dev.mccue.log.alpha.Logger;
+import dev.mccue.log.alpha.LoggerFactory;
 import dev.mccue.log.alpha.generate.DeriveLogger;
 
 import java.util.List;
 import java.util.UUID;
 
 @DeriveLogger
-public final class Main implements MainLog {
+public final class Main {
+    private static final Logger.Namespaced log = LoggerFactory.getLogger(Main.class);
     public static void main(String[] args) throws InterruptedException {
         log.info("some-event", Log.Entry.of("thing", "ABC"));
 

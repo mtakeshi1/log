@@ -38,7 +38,7 @@ import java.util.concurrent.ThreadLocalRandom;
  * Whether you choose to have a bytes representation or string representation
  * it uses an encoding which maintain the ordering.
  * Which it means that:
- * if `flake1 < flake2` then `flake1.toString() &lt; flake2.toString()`
+ * if `flake1 &lt; flake2` then `flake1.toString() &lt; flake2.toString()`
  * Internally it uses a NON STANDARD base64 encoding to preserve the ordering.
  * Unfortunately, the standard Base64 encoding doesn't preserve this property
  * as defined in <a href="https://en.wikipedia.org/wiki/Base64">https://en.wikipedia.org/wiki/Base64</a>.

@@ -10,6 +10,7 @@
     <packaging>jar</packaging>
 
     <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.deploy.skip>true</maven.deploy.skip>
     </properties>
 
@@ -21,14 +22,8 @@
         </dependency>
         <dependency>
             <groupId>dev.mccue</groupId>
-            <artifactId>log.alpha.json</artifactId>
-            <version>0.0.1</version>
-        </dependency>
-        <dependency>
-            <groupId>dev.mccue</groupId>
             <artifactId>log.alpha.jackson</artifactId>
             <version>0.0.1</version>
-            <scope>compile</scope>
         </dependency>
     </dependencies>
 
@@ -71,6 +66,10 @@
                         </goals>
                     </execution>
                 </executions>
+                <configuration>
+                    <release>18</release>
+                    <additionalOptions>--enable-preview</additionalOptions>
+                </configuration>
             </plugin>
         </plugins>
     </build>

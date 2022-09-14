@@ -5,7 +5,6 @@ import java.util.List;
 /**
  * A logger.
  *
- * @implNote
  * <p>Default methods are provided for common log levels and overloads are provided
  * for up to 10 Log.Entry parameters to avoid allocating arrays while having
  * convenient calling conventions.</p>
