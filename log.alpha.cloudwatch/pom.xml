@@ -25,10 +25,18 @@
             <artifactId>log.alpha.publisher</artifactId>
             <version>${project.version}</version>
         </dependency>
+
+        <dependency>
+            <groupId>dev.mccue</groupId>
+            <artifactId>log.alpha.jackson</artifactId>
+            <version>0.0.1</version>
+            <scope>compile</scope>
+        </dependency>
+
         <dependency>
             <groupId>software.amazon.awssdk</groupId>
-            <artifactId>cloudwatch</artifactId>
-            <version>2.17.271</version>
+            <artifactId>cloudwatchlogs</artifactId>
+            <version>2.17.272</version>
         </dependency>
     </dependencies>
 </project>

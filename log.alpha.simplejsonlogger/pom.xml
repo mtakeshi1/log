@@ -20,11 +20,6 @@
             <artifactId>log.alpha</artifactId>
             <version>${project.version}</version>
         </dependency>
-<!--        <dependency>-->
-<!--            <groupId>dev.mccue</groupId>-->
-<!--            <artifactId>log.alpha.json</artifactId>-->
-<!--            <version>0.0.1</version>-->
-<!--        </dependency>-->
         <dependency>
             <groupId>dev.mccue</groupId>
             <artifactId>log.alpha.jackson</artifactId>
